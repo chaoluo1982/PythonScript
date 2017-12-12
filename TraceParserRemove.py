@@ -1,7 +1,8 @@
 import os
 import re
+import sys
 
-def parsefile(fullfilename):
+def parsefile(fullfilename, keywordList):
     
     blockPattern = re.compile(r'(^\[.*)')   #indicate new block, if we have time stamp
     continuePrint = False
@@ -18,10 +19,13 @@ def parsefile(fullfilename):
     # we have 2 pattern here!!
     searchPatternList = []
 
-    searchPattern1 = re.compile(r"""        
-				^((?!implemented).)*$       #do not match this keywords
-				""", re.X)
-    searchPatternList.append(searchPattern1)
+    #searchPattern1 = re.compile(r"""        
+    #				^((?!implemented).)*$       #do not match this keywords
+    #				""", re.X)
+    for keyword in keywordList:
+        regRuleKeyWord = r"^((?!" + re.escape(keyword) + r").)*$"               #group 1, match trace time, [^]] means match anything except ]
+        searchPattern = re.compile(regRuleKeyWord )
+        searchPatternList.append(searchPattern)
 
     
 
@@ -40,6 +44,7 @@ def parsefile(fullfilename):
 
     
     (pathname, filename) = os.path.split(fullfilename)  # split to paht and filename
+    pathname = os.path.abspath(pathname)
     newfilename = "new_" + filename                     # new file name 
     newfilename = os.path.join(pathname, newfilename)
     
@@ -50,21 +55,27 @@ def parsefile(fullfilename):
                     # find new block
                     continuePrint = False
                     # find the line with keywords, print the captured groups in the matching result
+		    # here search pattern in the list is And relation, all must match will print it out
                     for searchPattern in searchPatternList:                                            
-                        searchresult = searchPattern.search(line)
-                        if searchresult:
-                            #newline = " ".join(searchresult.groups())
-                            #outputfile.write(newline)
-		            outputfile.write(line)
-                            continuePrint = True
+                        searchresult = searchPattern.match(line)
+                        if not searchresult:
                             break
+		    else:
+			outputfile.write(line)
+			#print whole block
+                        continuePrint = True  
                 else:
                     # still old block, then print everyting within this block
                     if continuePrint:
                         outputfile.write(line)
 
-filename = "/home/eluchao/NRCarrier_p1.log"
-parsefile(filename)
+
+
+def main(filename, keywordList):
+    parsefile(filename, keywordList)
+
+if __name__ == "__main__":
+    main(sys.argv[1], sys.argv[2:])
 
 
         

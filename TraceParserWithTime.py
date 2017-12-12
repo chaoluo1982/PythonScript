@@ -1,5 +1,7 @@
 import os
 import re
+import sys
+
 from datetime import datetime
 
 def withinTimeDelta(inputtime):
@@ -41,6 +43,7 @@ def parsefile(fullfilename):
 
     
     (pathname, filename) = os.path.split(fullfilename)  # split to paht and filename
+    pathname = os.path.abspath(pathname)
     newfilename = "new_" + filename                     # new file name 
     newfilename = os.path.join(pathname, newfilename)
     
@@ -79,7 +82,11 @@ endtimedt = datetime.strptime("2016-09-08 11:40:14", "%Y-%m-%d %H:%M:%S")
 keyword1 = "iesa.c:331"
 keyword2 = "ELIB_BC"
 
-parsefile(filename)
+def main(filename):
+    parsefile(filename)
+
+if __name__ == "__main__":
+    main(sys.argv[1])
 
 
         

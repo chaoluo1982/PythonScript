@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 
 def parsefile(fullfilename):
     
@@ -37,6 +38,7 @@ def parsefile(fullfilename):
 
     
     (pathname, filename) = os.path.split(fullfilename)  # split to paht and filename
+    pathname = os.path.abspath(pathname)
     newfilename = "new_" + filename                     # new file name 
     newfilename = os.path.join(pathname, newfilename)
     
@@ -60,8 +62,10 @@ def parsefile(fullfilename):
                     if continuePrint:
                         outputfile.write(line)
 
-filename = "/home/eluchao/NRCarrier_p1.log"
-parsefile(filename)
+def main(filename):
+    parsefile(filename)
 
+if __name__ == "__main__":
+    main(sys.argv[1])
 
         
