@@ -11,7 +11,7 @@ def withinTimeDelta(inputtime):
     return False
 
 
-def parsefile(fullfilename):
+def parsefile(fullfilename, keywordList):
     
     blockPattern = re.compile(r'(^\[.*)')   #indicate new block, if we have time stamp
     continuePrint = False
@@ -28,17 +28,22 @@ def parsefile(fullfilename):
     # we have 2 pattern here!!
     searchPatternList = []
 
-    #search pattern regex list                              
-    regRuleTime = r"^(\[[^]]+\]).*"                    #group, match trace time, [^]] means match anything except ]
-    regRuleKeyWord1 = r"(" + re.escape(keyword1) + r")"+ r".*"      #match this keywords
-    regRuleMsg = r"(msg\s{1}=.*\n)"                    #group, match msg = ...., \s{1} means we must have 1 space here if we use VERBOSE, [^}] means match anything except }, space will be ignored so it must be stated and escaped.
-    searchPattern1 = re.compile(regRuleTime + regRuleKeyWord1 + regRuleMsg)
-    searchPatternList.append(searchPattern1)
+    for keyword in keywordList:
+        regRuleKeyWord = r"^(\[[^]]+\]).*" + re.escape(keyword)               #group 1, match trace time, [^]] means match anything except ]
+        searchPattern = re.compile(regRuleKeyWord )
+        searchPatternList.append(searchPattern)
+
+#    #search pattern regex list                              
+#    regRuleTime = r"^(\[[^]]+\]).*"                    #group, match trace time, [^]] means match anything except ]
+#    regRuleKeyWord1 = r"(" + re.escape(keyword1) + r")"+ r".*"      #match this keywords
+#    regRuleMsg = r"(msg\s{1}=.*\n)"                    #group, match msg = ...., \s{1} means we must have 1 space here if we use VERBOSE, [^}] means match anything except }, space will be ignored so it must be stated and escaped.
+#    searchPattern1 = re.compile(regRuleTime + regRuleKeyWord1 + regRuleMsg)
+#    searchPatternList.append(searchPattern1)
 
 
-    regRuleKeyWord2 = r"(" + re.escape(keyword2) + r".*\n)"               #group 1, match trace time, [^]] means match anything except ]
-    searchPattern2 = re.compile(regRuleTime + regRuleKeyWord2 )
-    searchPatternList.append(searchPattern2)
+#    regRuleKeyWord2 = r"(" + re.escape(keyword2) + r".*\n)"               #group 1, match trace time, [^]] means match anything except ]
+#    searchPattern2 = re.compile(regRuleTime + regRuleKeyWord2 )
+#    searchPatternList.append(searchPattern2)
 
 
     
@@ -57,7 +62,7 @@ def parsefile(fullfilename):
                     for searchPattern in searchPatternList:                                            
                         searchresult = searchPattern.search(line)
                         if searchresult:
-                            newline = " ".join(searchresult.groups())
+                            #newline = " ".join(searchresult.groups())
 
                             #time stamp handling
                             timestamp = searchresult.group(1)
@@ -65,7 +70,7 @@ def parsefile(fullfilename):
                             timestampstr = timestampstr.split(".")[0]   #remove milliseconds
                             
                             if withinTimeDelta(timestampstr):
-                                outputfile.write(newline)
+                                outputfile.write(line)
                                 continuePrint = True
 
                             break
@@ -74,19 +79,15 @@ def parsefile(fullfilename):
                     if continuePrint:
                         outputfile.write(line)
 
-filename = "C:\\Users\\eluchao\\Desktop\\D\\python\\example\\traceeaxmple.txt"
 
-starttimedt = datetime.strptime("2016-09-08 11:06:58", "%Y-%m-%d %H:%M:%S")
-endtimedt = datetime.strptime("2016-09-08 11:40:14", "%Y-%m-%d %H:%M:%S")
+starttimedt = datetime.strptime("2000-01-01 00:00:20", "%Y-%m-%d %H:%M:%S")
+endtimedt = datetime.strptime("2000-01-01 00:00:24", "%Y-%m-%d %H:%M:%S")
 
-keyword1 = "iesa.c:331"
-keyword2 = "ELIB_BC"
-
-def main(filename):
-    parsefile(filename)
+def main(filename, keywordList):
+    parsefile(filename, keywordList)
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(sys.argv[1], sys.argv[2:])
 
 
         

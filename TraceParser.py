@@ -2,7 +2,7 @@ import os
 import re
 import sys
 
-def parsefile(fullfilename):
+def parsefile(fullfilename, keywordList):
     
     blockPattern = re.compile(r'(^\[.*)')   #indicate new block, if we have time stamp
     continuePrint = False
@@ -23,12 +23,17 @@ def parsefile(fullfilename):
 
     
 
-    searchPattern1 = re.compile(r"""^(\[[^]]+\]).*          #group, match trace time, [^]] means match anything except ]
-                                (boardCtrl[.]cc)            #match this keywords
-                                .*                          #anything in between
-                               (msg\s{1}=.*\n)              #group, match msg = ...., \s{1} means we must have 1 space here, [^}] means match anything except }, space will be ignored so it must be stated and escaped.
-                               """, re.X)
-    searchPatternList.append(searchPattern1)
+#    searchPattern1 = re.compile(r"""^(\[[^]]+\]).*          #group, match trace time, [^]] means match anything except ]
+#                                (boardCtrl[.]cc)            #match this keywords
+#                                .*                          #anything in between
+#                               (msg\s{1}=.*\n)              #group, match msg = ...., \s{1} means we must have 1 space here, [^}] means match anything except }, space will be ignored so it must be stated and escaped.
+#                               """, re.X)
+#    searchPatternList.append(searchPattern1)
+
+    for keyword in keywordList:
+        regRuleKeyWord = r"^(\[[^]]+\]).*" + re.escape(keyword)               #group 1, match trace time, [^]] means match anything except ]
+        searchPattern = re.compile(regRuleKeyWord )
+        searchPatternList.append(searchPattern)
 #
 #    
 #    searchPattern2 = re.compile(r"""^(\[[^]]+\]).*           #group 1, match trace time, [^]] means match anything except ]
@@ -62,10 +67,10 @@ def parsefile(fullfilename):
                     if continuePrint:
                         outputfile.write(line)
 
-def main(filename):
-    parsefile(filename)
+def main(filename, keywordList):
+    parsefile(filename, keywordList)
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(sys.argv[1], sys.argv[2:])
 
         
