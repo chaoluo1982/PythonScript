@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 This script is used to extract api-tester-radio log from /var/log/syslog.
 
